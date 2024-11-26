@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+
+<div class="container">
+    <div class="nav">
+        <h1>All Posts</h1>
+        <a class="btn btn-info btn-lg" href="/blog" role="button"> My Posts</a>
+    </div>
+    <hr>
+  
+  <ul id="postsList">
+    <% posts.forEach(post => { %>
+    <li>
+      <h2><%= post.title %></h2>
+      <small><%= post.created_at %></small>
+      <p><%= post.content %></p>
+      <small>By: <%= post.author %></small>
+      <!-- No edit or delete links -->
+    </li>
+    <% }) %>
+  </ul>
+</div>
+
+<%- include('partials/footer') %>
