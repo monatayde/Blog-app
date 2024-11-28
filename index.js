@@ -7,9 +7,8 @@ import passport from "passport";
 import { Strategy } from "passport-local";
 import env from "dotenv";
 import GoogleStratergy from "passport-google-oauth2";
-import dotenv from 'dotenv';
-dotenv.config();
-
+import pgSession from 'connect-pg-simple'
+import dotenv from "dotenv";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,7 +17,8 @@ env.config();
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET ||'default_secret_key',
+    store: new pgSession({ pool: db }),
+    secret: process.env.SESSION_SECRET || "default_secret_key",
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -43,14 +43,14 @@ db.connect()
     console.error("Database connection error:", err.stack);
   });
 
-  // const db = new pg.Client({
-  //   user: process.env.PG_USER,
-  //   host: process.env.PG_HOST,
-  //   database: process.env.PG_DATABASE,
-  //   password: process.env.PG_PASSWORD,
-  //   port: process.env.PG_PORT,
-  // });
-  // db.connect();
+// const db = new pg.Client({
+//   user: process.env.PG_USER,
+//   host: process.env.PG_HOST,
+//   database: process.env.PG_DATABASE,
+//   password: process.env.PG_PASSWORD,
+//   port: process.env.PG_PORT,
+// });
+// db.connect();
 
 //handle router
 app.get("/", (req, res) => {
