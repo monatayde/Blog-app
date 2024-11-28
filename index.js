@@ -17,17 +17,7 @@ const port = process.env.PORT || 3000;
 const saltRounds = 10;
 env.config();
 
-app.use(
-  session({
-    store: new pgSession({ pool: db }),
-    secret: process.env.SESSION_SECRET || "default_secret_key",
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24,
-    },
-  })
-);
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(passport.initialize());
@@ -40,6 +30,17 @@ const db = new pg.Client({
 db.connect()
   .then(() => {
     console.log("Connected to the database");
+    app.use(
+      session({
+        store: new pgSession({ pool: db }),
+        secret: process.env.SESSION_SECRET || "default_secret_key",
+        resave: false,
+        saveUninitialized: true,
+        cookie: {
+          maxAge: 1000 * 60 * 60 * 24,
+        },
+      })
+    );
   })
   .catch((err) => {
     console.error("Database connection error:", err.stack);
