@@ -18,7 +18,7 @@ env.config();
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET ||'default_secret_key',
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -42,6 +42,15 @@ db.connect()
   .catch((err) => {
     console.error("Database connection error:", err.stack);
   });
+
+  // const db = new pg.Client({
+  //   user: process.env.PG_USER,
+  //   host: process.env.PG_HOST,
+  //   database: process.env.PG_DATABASE,
+  //   password: process.env.PG_PASSWORD,
+  //   port: process.env.PG_PORT,
+  // });
+  // db.connect();
 
 //handle router
 app.get("/", (req, res) => {
