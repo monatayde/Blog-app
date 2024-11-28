@@ -9,7 +9,7 @@ import env from "dotenv";
 import GoogleStratergy from "passport-google-oauth2";
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 const saltRounds = 10;
 env.config();
 
@@ -29,13 +29,16 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const db = new pg.Client({
-  user: process.env.PG_USER,
-  host: process.env.PG_HOST,
-  database: process.env.PG_DATABASE,
-  password: process.env.PG_PASSWORD,
-  port: process.env.PG_PORT,
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
 });
-db.connect();
+db.connect()
+  .then(() => {
+    console.log("Connected to the database");
+  })
+  .catch((err) => {
+    console.error("Database connection error:", err.stack);
+  });
 
 //handle router
 app.get("/", (req, res) => {
@@ -60,7 +63,10 @@ app.get("/register", (req, res) => {
 app.get("/blog", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
-      const result = await db.query("SELECT * FROM posts WHERE user_id = $1 ORDER BY created_at DESC", [req.user.id]);
+      const result = await db.query(
+        "SELECT * FROM posts WHERE user_id = $1 ORDER BY created_at DESC",
+        [req.user.id]
+      );
       res.render("blog.ejs", { posts: result.rows });
     } catch (error) {
       console.error("Error fetching posts:", error);
@@ -103,14 +109,15 @@ app.get("/edit/:id", async (req, res) => {
 
 app.get("/all-posts", async (req, res) => {
   try {
-    const result = await db.query("SELECT * FROM posts ORDER BY created_at DESC");
+    const result = await db.query(
+      "SELECT * FROM posts ORDER BY created_at DESC"
+    );
     res.render("all-post.ejs", { posts: result.rows });
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).json({ message: "Error fetching posts" });
   }
 });
-
 
 app.get(
   "/auth/google",
@@ -171,7 +178,7 @@ app.post("/posts/:id", async (req, res) => {
 
 // insert into posts
 app.post("/posts", async (req, res) => {
-  const { title, content, author, } = req.body;
+  const { title, content, author } = req.body;
   const user_id = req.user.id;
   console.log("Request body:", req.body);
 
