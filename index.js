@@ -10,6 +10,8 @@ import GoogleStratergy from "passport-google-oauth2";
 import pgSession from 'connect-pg-simple'
 import dotenv from "dotenv";
 
+dotenv.config()
+
 const app = express();
 const port = process.env.PORT || 3000;
 const saltRounds = 10;
